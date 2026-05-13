@@ -114,7 +114,7 @@ $RECYCLE.BIN/
 # Logs and databases
 # ============================================
 *.log
-*.sql
+# *.sql
 *.sql.gz
 *.csv
 logs/
