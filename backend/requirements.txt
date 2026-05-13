@@ -1,0 +1,31 @@
+# ============================================
+# Green Bean Grading - Backend Dependencies
+# ============================================
+# Compatible dengan Python 3.10 - 3.11 di MacBook M2 (Apple Silicon)
+
+# FastAPI Web Framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+python-multipart==0.0.12
+
+# Database (MySQL)
+sqlalchemy==2.0.35
+pymysql==1.1.1
+cryptography==43.0.1
+alembic==1.13.3
+
+# YOLO & Computer Vision
+ultralytics==8.3.0
+opencv-python==4.10.0.84
+pillow==10.4.0
+numpy==1.26.4
+
+# Untuk MacBook M2 (Apple Silicon) - PyTorch dengan dukungan MPS
+torch==2.4.1
+torchvision==0.19.1
+
+# Utilities
+pydantic==2.9.2
+pydantic-settings==2.5.2
+python-dotenv==1.0.1
+PyYAML==6.0.2

@@ -1,0 +1,228 @@
+# ============================================
+# Python
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env
+.venv
+venv/
+ENV/
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# ============================================
+# Training files - DIECUALIKAN (sesuai request)
+# ============================================
+training/
+training/**
+!training/requirements.txt
+!training/data.yaml
+training/.venv/
+training/.venv_train/
+training/__pycache__/
+training/runs/
+training/runs/**
+*.pt
+*.pth
+*.ckpt
+*.weights
+*.onnx
+*.engine
+*.mlmodel
+
+# Model weights - HANYA best.pt yang dikecualikan
+# (file .pt lain juga dikecualikan)
+**/weights/*.pt
+**/weights/best.pt
+**/weights/last.pt
+best.pt
+last.pt
+*.pt
+
+# ============================================
+# Node.js / Frontend
+# ============================================
+node_modules/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+frontend/dist/
+frontend/dist-ssr/
+*.local
+frontend/.vite/
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# ============================================
+# IDE dan Editor
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.vscode/
+.idea/
+*.sublime-*
+.project
+.classpath
+.settings/
+*.code-workspace
+
+# ============================================
+# OS Generated Files
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.cab
+*.lnk
+desktop.ini
+$RECYCLE.BIN/
+
+# ============================================
+# Database
+# ============================================
+*.db
+*.sqlite
+*.sqlite3
+*.mdb
+*.accdb
+
+# ============================================
+# Logs and databases
+# ============================================
+*.log
+*.sql
+*.sql.gz
+*.csv
+logs/
+log/
+
+# ============================================
+# Backend specific
+# ============================================
+backend/uploads/
+backend/uploads/**
+!backend/uploads/.gitkeep
+backend/.env
+backend/.env.local
+backend/.env.*.local
+*.pid
+backend/__pycache__/
+backend/app/__pycache__/
+backend/app/models/__pycache__/
+backend/app/routers/__pycache__/
+backend/app/services/__pycache__/
+
+# ============================================
+# Frontend specific
+# ============================================
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+frontend/.eslintcache
+frontend/*.tsbuildinfo
+
+# ============================================
+# Temporary files
+# ============================================
+*.tmp
+*.temp
+*.cache
+*.bak
+*.backup
+*.old
+*.orig
+
+# ============================================
+# Datasets (opsional - comment jika ingin di-track)
+# ============================================
+datasets/
+!datasets/.gitkeep
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+
+# ============================================
+# Testing images
+# ============================================
+testing-image/
+testing-image/**
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.webp
+!**/.gitkeep
+
+# ============================================
+# Environment & Secrets
+# ============================================
+*.key
+*.pem
+*.crt
+*.p12
+.secrets/
+secrets/
+credentials.json
+*.secret
+
+# ============================================
+# Package manager locks (opsional)
+# ============================================
+# package-lock.json  # Uncomment jika ingin ignore lockfile
+
+# ============================================
+# Jupyter Notebook
+# ============================================
+.ipynb_checkpoints/
+*.ipynb
+
+# ============================================
+# Docker
+# ============================================
+*.pid
+docker-compose.override.yml
+.dockerignore
+
+# ============================================
+# Coverage reports
+# ============================================
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.coverage
+.coverage.*
+cover/
+*.cover
+
+# ============================================
+# Profile and benchmark
+# ============================================
+*.prof
+*.lprof
