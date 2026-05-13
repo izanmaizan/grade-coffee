@@ -1,0 +1,22 @@
+path: /Users/izanm/project/grade-coffee/datasets/green-bean-defects
+train: train/images
+val: valid/images
+
+nc: 16
+names:
+  0: broken
+  1: cut
+  2: dry_cherry
+  3: fade
+  4: floater
+  5: full_black
+  6: full_sour
+  7: fungus
+  8: husk
+  9: immature
+  10: parchment
+  11: partial_black
+  12: partial_sour
+  13: severe_insect_damage
+  14: shell
+  15: withered

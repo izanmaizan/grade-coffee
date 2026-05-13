@@ -26,19 +26,19 @@ dmypy.json
 # ============================================
 # Training files - DIECUALIKAN (sesuai request)
 # ============================================
-training/
-training/**
-!training/requirements.txt
-!training/data.yaml
+# training/
+# training/**
+# !training/requirements.txt
+# !training/data.yaml
 training/.venv/
 training/.venv_train/
 training/__pycache__/
 training/runs/
 training/runs/**
-*.pt
-*.pth
-*.ckpt
-*.weights
+# *.pt
+# *.pth
+# *.ckpt
+# *.weights
 *.onnx
 *.engine
 *.mlmodel
