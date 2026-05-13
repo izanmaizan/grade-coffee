@@ -170,13 +170,13 @@ datasets/
 # ============================================
 # Testing images
 # ============================================
-testing-image/
-testing-image/**
-*.jpg
-*.jpeg
-*.png
-*.bmp
-*.webp
+# testing-image/
+# testing-image/**
+# *.jpg
+# *.jpeg
+# *.png
+# *.bmp
+# *.webp
 !**/.gitkeep
 
 # ============================================
