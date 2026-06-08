@@ -6,6 +6,10 @@ from typing import Optional, Dict, Any
 from pydantic import BaseModel, Field, ConfigDict
 
 
+# Regex hex color #RGB atau #RRGGBB (#14)
+HEX_COLOR_PATTERN = r"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+
+
 # ==================================================
 # GRADE PRICE SCHEMAS
 # ==================================================
@@ -16,7 +20,7 @@ class GradePriceBase(BaseModel):
     price_per_gram: float = Field(..., ge=0)
     min_defects: int = Field(..., ge=0)
     max_defects: Optional[int] = Field(None, ge=0)
-    color: str = Field("#808080", max_length=20)
+    color: str = Field("#808080", pattern=HEX_COLOR_PATTERN)
 
 
 class GradePriceCreate(GradePriceBase):
@@ -31,7 +35,7 @@ class GradePriceUpdate(BaseModel):
     price_per_gram: Optional[float] = Field(None, ge=0)
     min_defects: Optional[int] = Field(None, ge=0)
     max_defects: Optional[int] = Field(None, ge=0)
-    color: Optional[str] = None
+    color: Optional[str] = Field(None, pattern=HEX_COLOR_PATTERN)
 
 
 class GradePriceResponse(GradePriceBase):
@@ -47,7 +51,9 @@ class GradePriceResponse(GradePriceBase):
 # ==================================================
 class AnalyzeRequest(BaseModel):
     """Form data: weight_gram dikirim bersama file."""
-    weight_gram: float = Field(350.0, gt=0, description="Berat sampel dalam gram")
+    weight_gram: float = Field(
+        350.0, gt=0, le=10000, description="Berat sampel dalam gram"
+    )
 
 
 class DetectionItem(BaseModel):
@@ -64,7 +70,11 @@ class AnalyzeResponse(BaseModel):
     result_image_url: str
     weight_gram: float
     total_defects: int
-    defects_per_350g: float
+    defects_per_350g: float          # (kompat) = nilai cacat per berat acuan
+    defect_value: float = 0.0        # nilai cacat (SNI) per berat acuan
+    reference_gram: int = 300        # berat acuan normalisasi
+    defect_berat: int = 0            # jumlah biji cacat berat (nilai tinggi)
+    defect_ringan: int = 0           # jumlah biji cacat ringan
     detection_summary: Dict[str, int]
     detections: list[DetectionItem]
 

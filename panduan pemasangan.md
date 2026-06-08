@@ -134,42 +134,37 @@ pip install torch==2.4.1 torchvision==0.19.1 --index-url https://download.pytorc
 ```
 
 #### 4.3 Buat File .env
+
+Salin dari template `.env.example` (JANGAN commit file `.env` — sudah masuk
+`.gitignore`):
 ```powershell
-# Buat file .env di folder backend
-New-Item -Path .env -ItemType File
+# Di folder backend
+Copy-Item .env.example .env
+```
+```bash
+# macOS / Linux
+cp .env.example .env
 ```
 
-Edit `.env` dengan Notepad atau VS Code:
+Lalu edit `.env` dan **ganti placeholder** sesuai lingkungan Anda. Yang wajib
+diperhatikan:
+
 ```env
-# Database Configuration
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_mysql_password_here    # GANTI dengan password MySQL Anda
+APP_ENV=development                 # 'production' saat deploy
+DB_USER=green_bean_user
+DB_PASSWORD=GANTI_DENGAN_PASSWORD    # WAJIB diisi di production
 DB_NAME=green_bean_grading
-
-# Model Configuration
-MODEL_PATH=weights\best.pt               # Windows pakai backslash
-
-# Upload Configuration  
-UPLOAD_DIR=uploads
-
-# CORS Origins
+MODEL_PATH=weights/best.pt           # Windows boleh pakai weights\best.pt
 CORS_ORIGINS=http://localhost:5173,http://localhost:3000
-
-# Detection Thresholds
-CONFIDENCE_THRESHOLD=0.25
-IOU_THRESHOLD=0.45
-
-# Device: 'auto', 'cpu', 'cuda' (jika punya NVIDIA GPU)
-DEVICE=auto
-
-# Tiling Configuration (opsional)
-TILING_ENABLED=false
-TILING_SIZE=640
-TILING_OVERLAP=100
-TTA_ENABLED=false
+CONFIDENCE_THRESHOLD=0.05            # nilai hasil tuning model saat ini
+IOU_THRESHOLD=0.3
+DEVICE=auto                          # 'auto' | 'cpu' | 'mps' | 'cuda'
 ```
+
+> Semua opsi lain (connection pool, rate limit, kompresi gambar, retensi upload,
+> logging) sudah ada di `.env.example` lengkap dengan komentar. Variabel yang
+> tidak dikenal akan **ditolak saat startup** (mencegah typo diam-diam), jadi
+> jangan menambah key sembarangan.
 
 #### 4.4 Siapkan Folder dan Model
 ```powershell

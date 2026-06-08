@@ -13,54 +13,44 @@ from app.models.db_models import GradePrice
 # ==================================================
 # Data awal grade — bisa diedit lewat UI nanti
 # ==================================================
+# Ambang = FULL DEFECT EQUIVALENT per berat acuan (SCA, per 300g). Harga = contoh,
+# sesuaikan via halaman Harga. Penentuan grade data-driven dari min/max_defects.
 DEFAULT_GRADES = [
     {
         "grade_code": "GRADE_1",
         "grade_name": "Specialty Grade",
         "description": (
-            "Kualitas tertinggi (SCA Specialty). Maksimum 5 defect per 350g, "
-            "tidak ada primary defect. Cocok untuk specialty coffee shop."
+            "Kualitas tertinggi (SCA, skor 80+). Toleransi cacat 0–3 per 300g. "
+            "Rasa bersih & kompleks. Cocok untuk specialty coffee shop / ekspor."
         ),
-        "price_per_gram": 180.0,   # Rp 180 / gram → Rp 180.000 / kg
+        "price_per_gram": 180.0,
         "min_defects": 0,
-        "max_defects": 5,
+        "max_defects": 3,
         "color": "#10b981",  # emerald-500
     },
     {
         "grade_code": "GRADE_2",
         "grade_name": "Premium Grade",
         "description": (
-            "Kualitas premium. 6-8 defect per 350g. "
-            "Cocok untuk komersial high-end / kafe menengah-atas."
+            "Kualitas tinggi (SCA, skor 70–80). Cacat 4–12 per 300g. "
+            "Konsisten & seimbang. Cocok untuk kafe / home brewing premium."
         ),
-        "price_per_gram": 130.0,   # Rp 130 / gram → Rp 130.000 / kg
-        "min_defects": 6,
-        "max_defects": 8,
+        "price_per_gram": 130.0,
+        "min_defects": 4,
+        "max_defects": 12,
         "color": "#3b82f6",  # blue-500
     },
     {
         "grade_code": "GRADE_3",
-        "grade_name": "Exchange Grade",
+        "grade_name": "Commercial Grade",
         "description": (
-            "Kualitas pasar / commercial. 9-23 defect per 350g. "
-            "Standar perdagangan kopi umum (commodity grade)."
+            "Kualitas komersial (SCA, skor <70). Cacat 13+ per 300g. "
+            "Profil standar (cokelat/kacang), untuk konsumsi harian / blend."
         ),
-        "price_per_gram": 85.0,    # Rp 85 / gram → Rp 85.000 / kg
-        "min_defects": 9,
-        "max_defects": 23,
-        "color": "#f59e0b",  # amber-500
-    },
-    {
-        "grade_code": "GRADE_4",
-        "grade_name": "Below Standard",
-        "description": (
-            "Kualitas di bawah standar. >23 defect per 350g. "
-            "Hanya cocok untuk blending kopi murah atau industri."
-        ),
-        "price_per_gram": 50.0,    # Rp 50 / gram → Rp 50.000 / kg
-        "min_defects": 24,
+        "price_per_gram": 85.0,
+        "min_defects": 13,
         "max_defects": None,
-        "color": "#ef4444",  # red-500
+        "color": "#f59e0b",  # amber-500
     },
 ]
 

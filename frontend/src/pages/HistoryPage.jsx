@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
-import { historyApi, formatDate, formatRupiah } from '../client'
+import { historyApi, formatDate, formatRupiah, resolveAssetUrl } from '../client'
 import { useToast } from '../App'
+import { GRADE_COLORS, DEFAULT_GRADE_COLOR } from '../constants'
 import { Search, Trash2, ChevronLeft, ChevronRight, History, ImageOff, Eye, Loader2, RefreshCw, X } from 'lucide-react'
 
 export default function HistoryPage() {
-  const { addToast } = useToast()
+  // useToast() mengembalikan fungsi addToast langsung, bukan object (#26)
+  const addToast = useToast()
   const [list, setList] = useState([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
@@ -41,13 +43,6 @@ export default function HistoryPage() {
 
   const totalPages = Math.ceil(total / pageSize)
 
-  const GRADE_COLORS = {
-    GRADE_1: '#10b981',
-    GRADE_2: '#3b82f6',
-    GRADE_3: '#f59e0b',
-    GRADE_4: '#ef4444',
-  }
-
   return (
     <div className="animate-fade-in space-y-6">
       {/* Header */}
@@ -65,10 +60,9 @@ export default function HistoryPage() {
               className="input pl-10 pr-4 py-2 text-sm w-40"
             >
               <option value="">Semua Grade</option>
-              <option value="GRADE_1">Grade 1</option>
-              <option value="GRADE_2">Grade 2</option>
-              <option value="GRADE_3">Grade 3</option>
-              <option value="GRADE_4">Grade 4</option>
+              <option value="GRADE_1">Specialty</option>
+              <option value="GRADE_2">Premium</option>
+              <option value="GRADE_3">Commercial</option>
             </select>
           </div>
           <button onClick={() => fetchData(page)} className="btn-ghost text-sm">
@@ -112,12 +106,12 @@ export default function HistoryPage() {
                       <td className="px-5 py-3.5 text-sm text-coffee-700 font-medium">{item.weight_gram}g</td>
                       <td className="px-5 py-3.5 text-center">
                         <span className="text-sm font-semibold text-coffee-800">{item.total_defects}</span>
-                        <span className="text-xs text-coffee-400 ml-1">({item.defects_per_350g?.toFixed(1)}/350g)</span>
+                        <span className="text-xs text-coffee-400 ml-1">(nilai {item.defects_per_350g?.toFixed(1)}/300g)</span>
                       </td>
                       <td className="px-5 py-3.5 text-center">
                         <span
                           className="badge font-bold text-white px-3 py-0.5"
-                          style={{ backgroundColor: GRADE_COLORS[item.grade_code] || '#808080' }}
+                          style={{ backgroundColor: GRADE_COLORS[item.grade_code] || DEFAULT_GRADE_COLOR }}
                         >
                           {item.grade_name}
                         </span>
@@ -127,15 +121,19 @@ export default function HistoryPage() {
                       </td>
                       <td className="px-5 py-3.5 text-center">
                         {item.result_image_path ? (
-                          <button onClick={() => setPreviewImg(item.result_image_path)} className="hover:opacity-80 transition-opacity">
-                            <img src={item.result_image_path} alt="result" className="w-12 h-12 object-cover rounded-lg mx-auto shadow-sm" />
+                          <button
+                            onClick={() => setPreviewImg(resolveAssetUrl(item.result_image_path))}
+                            className="hover:opacity-80 transition-opacity"
+                            aria-label={`Lihat gambar hasil analisa ${item.grade_name}`}
+                          >
+                            <img src={resolveAssetUrl(item.result_image_path)} alt={`Hasil deteksi ${item.grade_name}`} className="w-12 h-12 object-cover rounded-lg mx-auto shadow-sm" />
                           </button>
                         ) : (
-                          <ImageOff size={20} className="text-coffee-300 mx-auto" />
+                          <ImageOff size={20} className="text-coffee-300 mx-auto" aria-label="Tidak ada gambar" />
                         )}
                       </td>
                       <td className="px-5 py-3.5 text-center">
-                        <button onClick={() => handleDelete(item.id)} className="btn-ghost text-red-500 hover:bg-red-50">
+                        <button onClick={() => handleDelete(item.id)} className="btn-ghost text-red-500 hover:bg-red-50" aria-label="Hapus data analisa">
                           <Trash2 size={16} />
                         </button>
                       </td>

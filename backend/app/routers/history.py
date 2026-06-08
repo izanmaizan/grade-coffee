@@ -6,7 +6,6 @@ Endpoint history & statistik:
   GET    /api/history/stats/summary → ringkasan untuk dashboard
 """
 from datetime import datetime, timedelta
-from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func
@@ -15,9 +14,13 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.db_models import AnalysisHistory
 from app.models.schemas import HistoryItem, HistoryListResponse, StatsResponse
+from app.services import storage
 
 
-router = APIRouter(prefix="/api/history", tags=["history"])
+router = APIRouter(prefix="/api/v1/history", tags=["history"])
+
+# Whitelist grade yang valid untuk filter (#28)
+VALID_GRADE_CODES = {"GRADE_1", "GRADE_2", "GRADE_3", "GRADE_4", "GRADE_5"}
 
 
 @router.get("", response_model=HistoryListResponse)
@@ -30,6 +33,9 @@ def list_history(
     """Ambil riwayat analisis dengan pagination, terbaru di atas."""
     query = db.query(AnalysisHistory)
     if grade_code:
+        # Validasi terhadap whitelist sebelum dipakai sebagai filter (#28)
+        if grade_code not in VALID_GRADE_CODES:
+            raise HTTPException(status_code=400, detail="grade_code tidak valid")
         query = query.filter(AnalysisHistory.grade_code == grade_code)
 
     total = query.count()
@@ -43,16 +49,11 @@ def list_history(
     # Convert path file menjadi URL untuk frontend
     results = []
     for item in items:
-        result_filename = (
-            Path(item.result_image_path).name if item.result_image_path else None
-        )
         results.append(
             HistoryItem(
                 id=item.id,
                 image_filename=item.image_filename,
-                result_image_path=(
-                    f"/uploads/{result_filename}" if result_filename else None
-                ),
+                result_image_path=storage.build_url(item.result_image_path),
                 weight_gram=item.weight_gram,
                 total_defects=item.total_defects,
                 defects_per_350g=item.defects_per_350g,
@@ -112,15 +113,10 @@ def get_history_detail(history_id: int, db: Session = Depends(get_db)):
     if not item:
         raise HTTPException(status_code=404, detail="Data tidak ditemukan")
 
-    result_filename = (
-        Path(item.result_image_path).name if item.result_image_path else None
-    )
     return HistoryItem(
         id=item.id,
         image_filename=item.image_filename,
-        result_image_path=(
-            f"/uploads/{result_filename}" if result_filename else None
-        ),
+        result_image_path=storage.build_url(item.result_image_path),
         weight_gram=item.weight_gram,
         total_defects=item.total_defects,
         defects_per_350g=item.defects_per_350g,
@@ -139,13 +135,8 @@ def delete_history(history_id: int, db: Session = Depends(get_db)):
     if not item:
         raise HTTPException(status_code=404, detail="Data tidak ditemukan")
 
-    # Optional: hapus file gambar fisik juga
-    for path_str in [item.image_path, item.result_image_path]:
-        if path_str:
-            try:
-                Path(path_str).unlink(missing_ok=True)
-            except Exception:
-                pass
+    # Hapus file gambar fisik juga; kegagalan dicatat, tidak ditelan (#15)
+    storage.delete_files(item.image_path, item.result_image_path)
 
     db.delete(item)
     db.commit()

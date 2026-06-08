@@ -4,24 +4,9 @@ import {
   Download, RefreshCw, Eye, EyeOff, ChevronDown, ChevronUp,
   Camera, CameraOff,
 } from 'lucide-react'
-import { analyzeApi, formatRupiah } from '../client'
+import { analyzeApi, formatRupiah, resolveAssetUrl } from '../client'
 import { useToast } from '../App'
-
-const GRADE_COLORS = {
-  GRADE_1: '#10b981',
-  GRADE_2: '#3b82f6',
-  GRADE_3: '#f59e0b',
-  GRADE_4: '#ef4444',
-  GRADE_5: '#6b7280',
-}
-
-const DEFECT_COLORS = [
-  '#f87171', '#fb923c', '#fbbf24', '#a3e635', '#34d399', '#22d3ee',
-  '#60a5fa', '#818cf8', '#c084fc', '#e879f9', '#fb7185', '#f97316',
-  '#facc15', '#4ade80', '#2dd4bf', '#38bdf8',
-]
-
-const WEIGHT_PRESETS = [50, 100, 350, 500]
+import { GRADE_COLORS, DEFAULT_GRADE_COLOR, DEFECT_COLORS, WEIGHT_PRESETS } from '../constants'
 
 /* ---- Helper: dataURL ke File ---- */
 function dataURLtoFile(dataurl, filename) {
@@ -38,7 +23,7 @@ export default function AnalyzePage() {
   const addToast = useToast()
   const [image, setImage] = useState(null)
   const [preview, setPreview] = useState(null)
-  const [weight, setWeight] = useState(350)
+  const [weight, setWeight] = useState(300)
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -271,7 +256,7 @@ export default function AnalyzePage() {
                   onChange={(e) => setWeight(Number(e.target.value) || 0)}
                   className="input pr-16"
                   min="1" max="10000"
-                  placeholder="contoh: 350"
+                  placeholder="contoh: 300"
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-coffee-400 font-medium">gram</span>
               </div>
@@ -290,7 +275,7 @@ export default function AnalyzePage() {
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-coffee-400 mt-1.5">Standar SCA: 350g per sampel</p>
+              <p className="text-xs text-coffee-400 mt-1.5">Berat fleksibel — dinormalisasi ke 300g (acuan SCA)</p>
             </div>
 
             {/* Tombol Aksi */}
@@ -376,7 +361,7 @@ export default function AnalyzePage() {
                 <div className="card p-5 flex items-center gap-4">
                   <div
                     className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold"
-                    style={{ backgroundColor: result.grade_color || GRADE_COLORS[result.grade_code] || '#808080' }}
+                    style={{ backgroundColor: result.grade_color || GRADE_COLORS[result.grade_code] || DEFAULT_GRADE_COLOR }}
                   >
                     {result.grade_code?.replace('GRADE_', '')}
                   </div>
@@ -395,8 +380,8 @@ export default function AnalyzePage() {
               {/* Statistik */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                  { label: 'Total Defect', value: result.total_defects, unit: 'item' },
-                  { label: 'per 350g', value: result.defects_per_350g?.toFixed(1), unit: 'defect' },
+                  { label: 'Total Biji Cacat', value: result.total_defects, unit: 'biji' },
+                  { label: `Nilai Cacat/${result.reference_gram ?? 300}g`, value: (result.defect_value ?? result.defects_per_350g)?.toFixed(1), unit: 'SCA' },
                   { label: 'Confidence', value: (result.confidence_avg * 100)?.toFixed(1), unit: '%' },
                   { label: 'Waktu Proses', value: (result.processing_time_ms / 1000)?.toFixed(2), unit: 'detik' },
                 ].map((stat, i) => (
@@ -406,6 +391,30 @@ export default function AnalyzePage() {
                     <p className="text-xs text-coffee-400">{stat.unit}</p>
                   </div>
                 ))}
+              </div>
+
+              {/* Rincian defect SCA (primary vs secondary) — dasar grading */}
+              <div className="card p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-coffee-800">Klasifikasi Cacat (SCA)</h4>
+                  <span className="text-xs text-coffee-400">Dasar penentuan grade & harga</span>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-xl p-3 bg-red-50 border border-red-100">
+                    <p className="text-xs text-red-600 font-medium">Primary (cacat berat)</p>
+                    <p className="text-2xl font-bold text-red-700 font-display">{result.defect_berat ?? 0}</p>
+                    <p className="text-[11px] text-red-400">black (hitam), sour (asam), foreign (benda asing)</p>
+                  </div>
+                  <div className="rounded-xl p-3 bg-amber-50 border border-amber-100">
+                    <p className="text-xs text-amber-600 font-medium">Secondary (cacat ringan)</p>
+                    <p className="text-2xl font-bold text-amber-700 font-display">{result.defect_ringan ?? 0}</p>
+                    <p className="text-[11px] text-amber-400">broken, husk, fraghusk, immature, infested</p>
+                  </div>
+                </div>
+                <p className="text-xs text-coffee-500 mt-3 flex items-start gap-1.5">
+                  <Info size={13} className="mt-0.5 flex-shrink-0 text-bean-500" />
+                  Grade dari <b className="mx-1">full defect equivalent per {result.reference_gram ?? 300}g</b> (cacat primary berbobot lebih besar), sesuai SCA.
+                </p>
               </div>
 
               {/* Ringkasan Defect dengan filter kelas */}
@@ -466,7 +475,7 @@ export default function AnalyzePage() {
                         </span>
                       </label>
                     )}
-                    <a href={result.result_image_url} download className="btn-ghost text-xs">
+                    <a href={resolveAssetUrl(result.result_image_url)} download className="btn-ghost text-xs" aria-label="Unduh gambar hasil anotasi">
                       <Download size={14} /> Unduh Anotasi
                     </a>
                   </div>

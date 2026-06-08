@@ -1,0 +1,50 @@
+# ============================================
+# CI — lint, build check backend & frontend (#36)
+# ============================================
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff
+      - name: Lint (ruff)
+        working-directory: backend
+        run: ruff check app/ || true   # non-blocking sampai aturan lint disepakati
+      - name: Import smoke test
+        working-directory: backend
+        env:
+          APP_ENV: development
+          REQUIRE_MODEL_ON_STARTUP: "false"
+        run: python -c "import app.main; print('backend import OK')"
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install
+        working-directory: frontend
+        run: npm ci
+      - name: Build
+        working-directory: frontend
+        run: npm run build

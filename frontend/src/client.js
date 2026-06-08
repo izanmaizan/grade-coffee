@@ -1,13 +1,30 @@
 /**
  * API client untuk komunikasi dengan backend FastAPI.
- * Vite proxy otomatis forward /api/* dan /uploads/* ke localhost:8000.
+ *
+ * Base URL diambil dari VITE_API_BASE_URL (#17). Default '/api/v1' agar
+ * di-proxy oleh Vite saat development. Untuk production, set
+ * VITE_API_BASE_URL ke domain backend (mis. https://api.domain.com/api/v1).
  */
 import axios from 'axios'
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1'
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE_URL,
   timeout: 60000,
 })
+
+/**
+ * Resolusi URL aset (gambar hasil) agar tetap benar saat backend berada di
+ * domain terpisah pada production (#17, #22). Set VITE_UPLOADS_BASE_URL ke
+ * origin backend (mis. https://api.domain.com) bila perlu.
+ */
+const UPLOADS_BASE_URL = import.meta.env.VITE_UPLOADS_BASE_URL || ''
+export const resolveAssetUrl = (path) => {
+  if (!path) return ''
+  if (/^https?:\/\//.test(path)) return path
+  return `${UPLOADS_BASE_URL}${path}`
+}
 
 export const pricesApi = {
   list: () => api.get('/prices').then(r => r.data),

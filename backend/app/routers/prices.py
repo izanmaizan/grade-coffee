@@ -16,9 +16,10 @@ from app.models.schemas import (
     GradePriceUpdate,
     GradePriceResponse,
 )
+from app.services import grade_cache
 
 
-router = APIRouter(prefix="/api/prices", tags=["prices"])
+router = APIRouter(prefix="/api/v1/prices", tags=["prices"])
 
 
 @router.get("", response_model=list[GradePriceResponse])
@@ -53,6 +54,7 @@ def create_price(payload: GradePriceCreate, db: Session = Depends(get_db)):
     db.add(grade)
     db.commit()
     db.refresh(grade)
+    grade_cache.invalidate()  # (#32)
     return grade
 
 
@@ -72,6 +74,7 @@ def update_price(
 
     db.commit()
     db.refresh(grade)
+    grade_cache.invalidate()  # (#32)
     return grade
 
 
@@ -82,4 +85,5 @@ def delete_price(grade_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Grade tidak ditemukan")
     db.delete(grade)
     db.commit()
+    grade_cache.invalidate()  # (#32)
     return None

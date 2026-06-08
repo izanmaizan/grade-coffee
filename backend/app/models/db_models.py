@@ -55,7 +55,8 @@ class AnalysisHistory(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     image_filename = Column(String(255), nullable=False)
-    image_path = Column(String(512), nullable=False)
+    # unique: cegah dua record menunjuk file fisik yang sama (#30)
+    image_path = Column(String(512), nullable=False, unique=True)
     result_image_path = Column(String(512), nullable=True)
 
     # Berat sampel yang diuji (gram)

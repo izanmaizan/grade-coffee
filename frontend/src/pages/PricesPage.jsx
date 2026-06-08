@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { pricesApi, formatRupiah } from '../client'
 import { useToast } from '../App'
+import { HEX_COLOR_OK } from '../constants'
 import Modal from '../components/Modal'
 import { Plus, Edit, Trash2, DollarSign, Package, Loader2, Coffee } from 'lucide-react'
 
@@ -15,7 +16,8 @@ const emptyForm = {
 }
 
 export default function PricesPage() {
-  const { addToast } = useToast()
+  // useToast() mengembalikan fungsi addToast langsung, bukan object (#26)
+  const addToast = useToast()
   const [prices, setPrices] = useState([])
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
@@ -66,6 +68,7 @@ export default function PricesPage() {
     if (!form.grade_name.trim()) errs.grade_name = 'Nama grade wajib diisi'
     if (form.price_per_gram < 0) errs.price_per_gram = 'Harga tidak boleh negatif'
     if (form.min_defects < 0) errs.min_defects = 'Min defect tidak boleh negatif'
+    if (!HEX_COLOR_OK(form.color)) errs.color = 'Warna harus format hex, mis. #10b981'
     setErrors(errs)
     return Object.keys(errs).length === 0
   }
@@ -174,7 +177,7 @@ export default function PricesPage() {
                       {item.grade_code}
                     </span>
                     <span className="text-xs text-coffee-400 font-mono">
-                      {item.min_defects}{item.max_defects != null ? `–${item.max_defects}` : '+'} defect/350g
+                      nilai cacat {item.min_defects}{item.max_defects != null ? `–${item.max_defects}` : '+'} /300g
                     </span>
                   </div>
 
@@ -195,9 +198,9 @@ export default function PricesPage() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-coffee-400 mb-0.5">per 350g</p>
+                      <p className="text-xs text-coffee-400 mb-0.5">per kg</p>
                       <p className="text-lg font-semibold text-coffee-700">
-                        {formatRupiah(item.price_per_gram * 350)}
+                        {formatRupiah(item.price_per_gram * 1000)}
                       </p>
                     </div>
                   </div>
@@ -252,9 +255,10 @@ export default function PricesPage() {
                   type="text"
                   value={form.color}
                   onChange={(e) => setForm(f => ({ ...f, color: e.target.value }))}
-                  className="input flex-1 font-mono text-sm"
+                  className={`input flex-1 font-mono text-sm ${errors.color ? 'border-red-300' : ''}`}
                 />
               </div>
+              {errors.color && <p className="text-xs text-red-500 mt-1">{errors.color}</p>}
             </div>
           </div>
 
@@ -293,22 +297,24 @@ export default function PricesPage() {
               {errors.price_per_gram && <p className="text-xs text-red-500 mt-1">{errors.price_per_gram}</p>}
             </div>
             <div>
-              <label className="label">Min Defect</label>
+              <label className="label">Nilai Cacat Min</label>
               <input
                 type="number"
                 value={form.min_defects}
                 onChange={(e) => setForm(f => ({ ...f, min_defects: Number(e.target.value) }))}
                 className="input"
+                title="Ambang bawah nilai cacat per 300g untuk grade ini"
               />
             </div>
             <div>
-              <label className="label">Max Defect</label>
+              <label className="label">Nilai Cacat Maks</label>
               <input
                 type="number"
                 value={form.max_defects ?? ''}
                 onChange={(e) => setForm(f => ({ ...f, max_defects: e.target.value ? Number(e.target.value) : null }))}
                 className="input"
-                placeholder="∞"
+                placeholder="∞ (tak terbatas)"
+                title="Ambang atas nilai cacat per 300g. Kosongkan untuk grade terendah (tak terbatas)."
               />
             </div>
           </div>
@@ -325,7 +331,7 @@ export default function PricesPage() {
             <div>
               <p className="text-sm font-semibold text-coffee-800">{form.grade_name || 'Nama Grade'}</p>
               <p className="text-xs text-coffee-500">
-                {formatRupiah(form.price_per_gram)}/gram • {form.min_defects}{form.max_defects != null ? `–${form.max_defects}` : '+'} defect/350g
+                {formatRupiah(form.price_per_gram)}/gram • nilai cacat {form.min_defects}{form.max_defects != null ? `–${form.max_defects}` : '+'} /300g
               </p>
             </div>
           </div>
