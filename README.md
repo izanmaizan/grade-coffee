@@ -1,254 +1,159 @@
-Berikut versi README yang sudah **dirapikan, diperjelas, dan dibuat lebih profesional + konsisten** tanpa mengubah inti proyekmu. Fokus perbaikan: konsistensi istilah, struktur, typo, clarity, dan sedikit peningkatan developer experience.
-
----
-
-```markdown
 # ☕ Green Bean Grading — AI-Powered Coffee Quality Inspection
 
 Sistem pendeteksi cacat biji kopi hijau (*green coffee bean defects*) berbasis **Computer Vision** menggunakan:
 
-- **YOLOv8** (deteksi objek)
-- **FastAPI** (backend API)
-- **MySQL** (database)
-- **React + Vite + Tailwind** (frontend)
-
-Dirancang untuk berjalan di **Windows (CPU maupun GPU NVIDIA CUDA)**.
+- **YOLOv8** — deteksi objek
+- **FastAPI** — backend API
+- **MySQL** — database
+- **React + Vite + Tailwind** — frontend
 
 ---
 
 ## 📁 Struktur Proyek
 
 ```
-
-green-bean-grading/
+grade-coffee/
 ├── backend/                  # FastAPI + YOLO inference
 │   ├── app/
 │   │   ├── main.py
 │   │   ├── config.py
 │   │   ├── database.py
 │   │   ├── models/           # SQLAlchemy & Pydantic
-│   │   │   ├── db_models.py
-│   │   │   └── schemas.py
-│   │   ├── routers/          # API endpoints
-│   │   │   ├── analyze.py
-│   │   │   ├── history.py
-│   │   │   └── prices.py
-│   │   ├── services/         # YOLO detection & grading logic
-│   │   │   └── detector.py
-│   │   └── seeders.py
+│   │   ├── routers/          # API endpoints (analyze, history, prices)
+│   │   └── services/         # YOLO detection & grading logic
 │   ├── weights/              # Model YOLO (best.pt)
-│   ├── uploads/              # Gambar input & hasil inferensi
-│   ├── .env
+│   ├── Dockerfile
 │   └── requirements.txt
 ├── frontend/                 # React + Tailwind
 │   ├── src/
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   ├── client.js         # Axios API client
-│   │   ├── pages/
-│   │   └── components/
-│   ├── tailwind.config.js
-│   ├── vite.config.ts
+│   ├── Dockerfile
 │   └── package.json
 ├── training/                 # Training YOLOv8
 │   ├── train.py
-│   ├── data.yaml
-│   └── requirements.txt
-├── datasets/                 # Dataset (Roboflow)
-│   └── green-bean-defects/
-│       ├── train/
-│       └── valid/
-└── database/
-└── init.sql
-
-````
+│   └── data.yaml
+├── datasets/
+│   └── coffee-bean/          # Dataset gabungan (9 kelas)
+├── docker-compose.yml
+└── .env
+```
 
 ---
 
-## 🛠️ Prasyarat (Windows)
+## 🚀 Menjalankan Aplikasi (Windows — Docker Desktop)
 
-Pastikan sudah terinstall:
+Cara termudah menjalankan proyek ini di Windows adalah menggunakan **Docker Desktop**. Tidak perlu install Python, Node.js, atau MySQL secara manual.
+
+### Prasyarat
 
 - **Windows 10/11 (64-bit)**
-- **Python 3.10 – 3.11**  
-  👉 https://www.python.org/downloads/
-- **Node.js (LTS)**  
-  👉 https://nodejs.org/
-- **MySQL Server** *(atau XAMPP)*  
-  👉 https://dev.mysql.com/downloads/installer/
-- **Git (opsional)**  
-  👉 https://git-scm.com/downloads
-
-### ⚡ Opsional (GPU NVIDIA)
-
-Untuk akselerasi model:
-
-- CUDA Toolkit → https://developer.nvidia.com/cuda-downloads  
-- cuDNN → https://developer.nvidia.com/cudnn  
+- **Docker Desktop untuk Windows**
+  👉 https://www.docker.com/products/docker-desktop/
+  > Saat instalasi, aktifkan opsi **"Use WSL 2"** (direkomendasikan)
 
 ---
 
-## ⚙️ Instalasi & Konfigurasi
-
-### 1. Clone / Ekstrak Proyek
+### Langkah 1 — Clone / Ekstrak Proyek
 
 ```powershell
-cd C:\Users\YourName\project\green-bean-grading
-````
+git clone <url-repo>
+cd grade-coffee
+```
+
+Atau ekstrak ZIP ke folder pilihan, lalu buka **PowerShell** / **Terminal** di dalam folder tersebut.
 
 ---
 
-### 2. Setup Database MySQL
+### Langkah 2 — Buat File `.env`
 
-```powershell
-mysql -u root -p
-```
-
-```sql
-CREATE DATABASE IF NOT EXISTS green_bean_grading
-CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-EXIT;
-```
-
-**Alternatif (XAMPP):**
-
-1. Jalankan MySQL di XAMPP
-2. Buka phpMyAdmin
-3. Buat database: `green_bean_grading`
-
----
-
-### 3. Setup Backend (FastAPI)
-
-```powershell
-cd backend
-
-python -m venv .venv
-.venv\Scripts\activate
-
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-
-copy .env.example .env
-```
-
-Edit file `.env`:
+Buat file `.env` di root folder proyek (sejajar dengan `docker-compose.yml`):
 
 ```env
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_password_here
+APP_ENV=development
+
 DB_NAME=green_bean_grading
+DB_USER=root
+DB_PASSWORD=
+
+CORS_ORIGINS=http://localhost:8080
 ```
 
-> 💡 Jika menggunakan XAMPP default:
-> `DB_PASSWORD=` (kosong)
+> File ini sudah ada di repo, cukup pastikan isinya sesuai di atas.
 
 ---
 
-### 4. Setup Frontend (React)
+### Langkah 3 — Pastikan Model Ada
+
+Pastikan file model `backend/weights/best.pt` tersedia.  
+Jika belum ada, minta file `best.pt` dari tim atau jalankan training terlebih dahulu (lihat bagian Training di bawah).
+
+---
+
+### Langkah 4 — Jalankan Docker
+
+Buka **PowerShell** atau **Command Prompt** di folder proyek, lalu jalankan:
 
 ```powershell
-cd ../frontend
-npm install
+docker compose up --build
+```
+
+Docker akan otomatis:
+1. Mendownload image yang dibutuhkan (MySQL, Python, Node, Nginx)
+2. Build image backend dan frontend
+3. Menjalankan migrasi database
+4. Menyalakan semua service
+
+> Proses build pertama membutuhkan waktu ~5–15 menit tergantung koneksi internet.
+
+---
+
+### Langkah 5 — Akses Aplikasi
+
+Setelah semua service berjalan (tidak ada error merah di terminal):
+
+| Service | URL |
+|---------|-----|
+| **Aplikasi (Frontend)** | http://localhost:8080 |
+| **Backend API** | http://localhost:8000 |
+| **API Docs (Swagger)** | http://localhost:8000/docs |
+
+---
+
+### Menghentikan Aplikasi
+
+```powershell
+docker compose down
+```
+
+Untuk menghentikan dan menghapus data database (reset total):
+
+```powershell
+docker compose down -v
 ```
 
 ---
 
-## 🧠 Training Model YOLOv8 (Opsional)
+### Menjalankan Ulang (setelah dihentikan)
 
-Gunakan ini jika ingin melatih model sendiri.
-
-```powershell
-cd training
-
-python -m venv .venv
-.venv\Scripts\activate
-
-pip install -r requirements.txt
-```
-
-Pastikan dataset tersedia di:
-
-```
-datasets/green-bean-defects/
-```
-
-Jalankan training:
+Tidak perlu `--build` lagi kecuali ada perubahan kode:
 
 ```powershell
-python train.py `
-  --data data.yaml `
-  --epochs 100 `
-  --batch 8 `
-  --device cpu `
-  --name green_bean_run1
+docker compose up
 ```
-
-### 💡 Tips
-
-* CPU: `--device cpu`
-* GPU: `--device 0`
-* Jika RAM kecil: gunakan `--batch 4`
-
-Setelah training:
-
-```powershell
-copy runs\detect\green_bean_run1\weights\best.pt ..\backend\weights\best.pt
-```
-
----
-
-## 🚀 Menjalankan Aplikasi
-
-### 1. Backend
-
-```powershell
-cd backend
-.venv\Scripts\activate
-
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-📌 API Docs:
-[http://localhost:8000/docs](http://localhost:8000/docs)
-
----
-
-### 2. Frontend
-
-```powershell
-cd frontend
-npm run dev
-```
-
-📌 Aplikasi:
-[http://localhost:5173](http://localhost:5173)
 
 ---
 
 ## 📸 Fitur Utama
 
-### 🔍 Analisa
-
-* Upload gambar biji kopi
-* Input berat sampel
-* Hasil:
-
-  * Jumlah defect
-  * Grade (SCA)
-  * Harga estimasi
-  * Gambar anotasi
+### 🔍 Analisa Biji Kopi
+- Upload gambar biji kopi hijau
+- Input berat sampel
+- Hasil: jumlah defect per kelas, grade (SCA), estimasi harga, gambar anotasi
 
 ### 💰 Manajemen Harga
-
-* CRUD harga per grade
+- CRUD harga per grade
 
 ### 📊 Riwayat
-
-* Lihat & filter hasil analisis
-* Hapus data riwayat
+- Lihat, filter, dan hapus hasil analisis sebelumnya
 
 ---
 
@@ -257,9 +162,9 @@ npm run dev
 ```
 Upload Gambar
     ↓
-Deteksi YOLOv8
+Deteksi YOLOv8 (best.pt)
     ↓
-Hitung defect / 350g
+Hitung defect per 350g
     ↓
 Penentuan grade (SCA)
     ↓
@@ -272,74 +177,89 @@ Tampilkan hasil
 
 ---
 
-## 🧪 Troubleshooting (Windows)
+## 🧠 Training Model YOLOv8 (Opsional)
 
-| Masalah                   | Solusi                             |
-| ------------------------- | ---------------------------------- |
-| `'python' not recognized` | Tambahkan Python ke PATH           |
-| MySQL access denied       | Cek `.env`                         |
-| `pip` error               | Upgrade pip                        |
-| Virtual env tidak aktif   | Gunakan `.venv\Scripts\activate`   |
-| Model tidak ditemukan     | Pastikan `weights/best.pt` ada     |
-| Port 8000 digunakan       | Ganti port                         |
-| Port 5173 digunakan       | Kill proses / ubah Vite config     |
-| Torch tidak support CUDA  | Install versi CPU                  |
-| Error VC++                | Install Visual C++ Redistributable |
+Gunakan ini jika ingin melatih ulang model dengan dataset sendiri.
+
+### Prasyarat Training
+
+- Python 3.10–3.12
+- Virtual environment
+
+```powershell
+cd grade-coffee
+
+python -m venv venv
+venv\Scripts\activate
+
+pip install -r training\requirements.txt
+```
+
+### Jalankan Training
+
+```powershell
+python training\train.py --data training\data.yaml --epochs 100
+```
+
+**Opsi tambahan:**
+
+| Flag | Default | Keterangan |
+|------|---------|------------|
+| `--epochs` | 100 | Jumlah epoch |
+| `--batch` | 16 | Batch size (kurangi jika RAM kecil, misal `--batch 8`) |
+| `--device` | auto | `cpu` / `cuda` / `0` |
+| `--model` | yolov8n.pt | Bisa pakai checkpoint `last.pt` untuk lanjut training |
+
+### Salin Model ke Backend
+
+Setelah training selesai:
+
+```powershell
+copy runs\detect\green_bean\weights\best.pt backend\weights\best.pt
+```
+
+Lalu rebuild container backend:
+
+```powershell
+docker compose up --build backend
+```
+
+---
+
+## 🧪 Troubleshooting
+
+| Masalah | Solusi |
+|---------|--------|
+| Docker Desktop tidak bisa dibuka | Pastikan WSL 2 aktif, restart PC |
+| `port is already allocated` | Port 8080 atau 8000 dipakai aplikasi lain — tutup aplikasi tersebut |
+| Backend restart terus | Cek isi `.env`, pastikan `APP_ENV=development` |
+| `best.pt` tidak ditemukan | Pastikan file ada di `backend/weights/best.pt` |
+| Build lambat | Wajar saat pertama kali, berikutnya lebih cepat karena cache |
+| Database error | Jalankan `docker compose down -v` lalu `docker compose up --build` |
 
 ---
 
 ## 🖥️ Spesifikasi Rekomendasi
 
-| Komponen | Minimal    | Rekomendasi      |
-| -------- | ---------- | ---------------- |
-| RAM      | 8 GB       | 16 GB            |
-| Storage  | 10 GB      | 20 GB SSD        |
-| GPU      | CPU        | NVIDIA GTX 1060+ |
-| OS       | Windows 10 | Windows 11       |
-| Python   | 3.10       | 3.11             |
+| Komponen | Minimal | Rekomendasi |
+|----------|---------|-------------|
+| RAM | 8 GB | 16 GB |
+| Storage | 10 GB | 20 GB SSD |
+| OS | Windows 10 | Windows 11 |
+| Docker Desktop | 4.x | Versi terbaru |
 
 ---
 
 ## 📚 Referensi
 
-* YOLOv8 → [https://docs.ultralytics.com](https://docs.ultralytics.com)
-* FastAPI → [https://fastapi.tiangolo.com](https://fastapi.tiangolo.com)
-* SCA → [https://sca.coffee](https://sca.coffee)
-* PyTorch → [https://pytorch.org](https://pytorch.org)
+- YOLOv8 → https://docs.ultralytics.com
+- FastAPI → https://fastapi.tiangolo.com
+- Docker Desktop → https://docs.docker.com/desktop/
+- SCA Grading → https://sca.coffee
 
 ---
 
 ## 📝 Lisensi
 
-Digunakan untuk keperluan **riset dan pendidikan**.
-Dataset bersumber dari **Roboflow Universe**.
-
-```
-
----
-
-## 🔥 Perbaikan yang saya lakukan (penting)
-
-Beberapa hal yang sebenarnya cukup krusial:
-
-1. **Nama folder tidak konsisten**
-   - `grade-coffee` → `green-bean-grading` (disamakan)
-
-2. **Bahasa campur-campur diperhalus**
-   - Indo + English tetap, tapi lebih natural
-
-3. **Struktur lebih clean & profesional**
-   - Section lebih rapi
-   - Heading konsisten
-
-4. **UX developer ditingkatkan**
-   - Tambah emoji ringan (biar enak dibaca GitHub)
-   - Tambah penjelasan fitur (biar recruiter paham cepat)
-
-5. **Instruksi dibuat lebih jelas**
-   - Step-by-step lebih tegas
-   - Tidak ambigu
-
----
-
-```
+Digunakan untuk keperluan **riset dan pendidikan**.  
+Dataset bersumber dari **Roboflow Universe** (CC BY 4.0).

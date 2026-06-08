@@ -43,14 +43,9 @@ training/runs/**
 *.engine
 *.mlmodel
 
-# Model weights - HANYA best.pt yang dikecualikan
-# (file .pt lain juga dikecualikan)
-# **/weights/*.pt
-# **/weights/best.pt
-# **/weights/last.pt
-# best.pt
-# last.pt
-# *.pt
+# Model weights — semua .pt diabaikan kecuali best.pt
+*.pt
+!**/weights/best.pt
 
 # ============================================
 # Node.js / Frontend

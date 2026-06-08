@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>☕ Green Bean Grading — Panduan Setup</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3250;
+      --accent: #6c8cff;
+      --accent2: #4ade80;
+      --warn: #facc15;
+      --text: #e2e8f0;
+      --muted: #8892a4;
+      --code-bg: #13151f;
+      --radius: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #1a1d27 0%, #0f1117 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 48px 24px 40px;
+      text-align: center;
+    }
+    header .emoji { font-size: 64px; display: block; margin-bottom: 12px; }
+    header h1 { font-size: 2rem; font-weight: 700; color: #fff; }
+    header p  { color: var(--muted); margin-top: 8px; font-size: 1rem; }
+    .badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+    .badge {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 13px;
+      color: var(--accent);
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15,17,23,0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      padding: 14px 16px;
+      font-size: 14px;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: all .2s;
+    }
+    nav a:hover { color: var(--text); border-bottom-color: var(--accent); }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* ── SECTION ── */
+    section { margin-bottom: 56px; scroll-margin-top: 60px; }
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h3 { font-size: 1.05rem; font-weight: 600; color: var(--text); margin: 24px 0 12px; }
+
+    p { color: var(--muted); margin-bottom: 12px; }
+    p strong { color: var(--text); }
+
+    /* ── STEPS ── */
+    .steps { display: flex; flex-direction: column; gap: 0; }
+    .step {
+      display: flex;
+      gap: 20px;
+      position: relative;
+    }
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 44px;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+    .step-body { padding-bottom: 32px; flex: 1; min-width: 0; }
+    .step-body h3 { margin-top: 8px; }
+
+    /* ── CODE BLOCK ── */
+    .code-wrap {
+      position: relative;
+      margin: 12px 0;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--code-bg);
+      overflow: hidden;
+    }
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 14px;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+    }
+    pre {
+      padding: 16px;
+      overflow-x: auto;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #c9d1d9;
+    }
+    code { font-family: inherit; }
+    pre .comment { color: #6e7681; }
+    pre .key     { color: #79c0ff; }
+    pre .val     { color: #a5d6ff; }
+    pre .cmd     { color: var(--accent2); }
+    pre .flag    { color: #d2a8ff; }
+    pre .url     { color: #f0883e; }
+
+    .copy-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 4px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .copy-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .copy-btn.copied { background: var(--accent2); border-color: var(--accent2); color: #000; }
+
+    /* ── CALLOUT ── */
+    .callout {
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: var(--radius);
+      margin: 14px 0;
+      font-size: 14px;
+    }
+    .callout.info  { background: rgba(108,140,255,.1); border: 1px solid rgba(108,140,255,.3); color: #a5b4fc; }
+    .callout.warn  { background: rgba(250,204, 21,.08); border: 1px solid rgba(250,204,21,.3); color: #fde68a; }
+    .callout.success { background: rgba(74,222,128,.08); border: 1px solid rgba(74,222,128,.3); color: #86efac; }
+    .callout-icon { flex-shrink: 0; font-size: 16px; }
+
+    /* ── TABLE ── */
+    table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 14px 0; }
+    th { background: var(--surface2); color: var(--text); font-weight: 600; padding: 10px 14px; text-align: left; border-bottom: 2px solid var(--border); }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--muted); }
+    tr:last-child td { border-bottom: none; }
+    td strong { color: var(--text); }
+    td a { color: var(--accent); text-decoration: none; }
+    td a:hover { text-decoration: underline; }
+
+    /* ── URL CARD ── */
+    .url-cards { display: flex; gap: 12px; flex-wrap: wrap; margin: 14px 0; }
+    .url-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      flex: 1;
+      min-width: 200px;
+    }
+    .url-card .label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .url-card .url-text { font-weight: 600; color: var(--accent); font-size: 15px; }
+    .url-card .url-desc { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    /* ── FLOW ── */
+    .flow { display: flex; flex-direction: column; align-items: flex-start; gap: 0; margin: 14px 0; }
+    .flow-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 20px;
+      font-size: 14px;
+      color: var(--text);
+      width: 100%;
+      max-width: 320px;
+    }
+    .flow-arrow { color: var(--accent); font-size: 18px; padding: 4px 0 4px 24px; }
+
+    /* ── TROUBLESHOOT ── */
+    .trouble-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .trouble-q {
+      padding: 12px 16px;
+      background: var(--surface2);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      color: var(--text);
+      user-select: none;
+    }
+    .trouble-q:hover { background: var(--surface); }
+    .trouble-q .arrow { transition: transform .2s; color: var(--muted); }
+    .trouble-q.open .arrow { transform: rotate(90deg); }
+    .trouble-a {
+      display: none;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: var(--muted);
+      background: var(--code-bg);
+      border-top: 1px solid var(--border);
+    }
+    .trouble-a.visible { display: block; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.5rem; }
+      .url-cards { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<header>
+  <span class="emoji">☕</span>
+  <h1>Green Bean Grading</h1>
+  <p>AI-Powered Coffee Quality Inspection — Panduan Setup Windows</p>
+  <div class="badges">
+    <span class="badge">YOLOv8</span>
+    <span class="badge">FastAPI</span>
+    <span class="badge">React + Vite</span>
+    <span class="badge">MySQL</span>
+    <span class="badge">Docker</span>
+  </div>
+</header>
+
+<!-- ═══════════ NAV ═══════════ -->
+<nav>
+  <a href="#prasyarat">Prasyarat</a>
+  <a href="#setup">Setup</a>
+  <a href="#akses">Akses</a>
+  <a href="#training">Training</a>
+  <a href="#alur">Alur Sistem</a>
+  <a href="#troubleshoot">Troubleshoot</a>
+</nav>
+
+<div class="container">
+
+  <!-- ═══════════ PRASYARAT ═══════════ -->
+  <section id="prasyarat">
+    <h2>🖥️ Prasyarat</h2>
+    <p>Hanya butuh <strong>satu aplikasi</strong> untuk menjalankan proyek ini di Windows:</p>
+
+    <div class="callout success">
+      <span class="callout-icon">✅</span>
+      <div>
+        <strong>Docker Desktop untuk Windows</strong><br/>
+        Semua dependency (Python, Node.js, MySQL) sudah terbundel di dalam Docker.
+        Tidak perlu install manual.
+        <br/><br/>
+        Download: <a href="https://www.docker.com/products/docker-desktop/" target="_blank" style="color:var(--accent2)">https://www.docker.com/products/docker-desktop/</a>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div>Saat instalasi Docker Desktop, aktifkan opsi <strong>"Use WSL 2 based engine"</strong> — lebih stabil dan cepat di Windows.</div>
+    </div>
+
+    <table>
+      <tr><th>Komponen</th><th>Minimal</th><th>Rekomendasi</th></tr>
+      <tr><td>OS</td><td>Windows 10 (64-bit)</td><td>Windows 11</td></tr>
+      <tr><td>RAM</td><td>8 GB</td><td>16 GB</td></tr>
+      <tr><td>Storage</td><td>10 GB</td><td>20 GB SSD</td></tr>
+      <tr><td>Docker Desktop</td><td>4.x</td><td>Versi terbaru</td></tr>
+    </table>
+  </section>
+
+  <!-- ═══════════ SETUP ═══════════ -->
+  <section id="setup">
+    <h2>⚙️ Setup & Menjalankan</h2>
+
+    <div class="steps">
+
+      <!-- Step 1 -->
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Clone / Ekstrak Proyek</h3>
+          <p>Buka <strong>PowerShell</strong> atau <strong>Command Prompt</strong>, lalu clone repo:</p>
+          <div class="code-wrap">
+            <div class="code-header">
+              <span>powershell</span>
+              <button class="copy-btn" onclick="copyCode(this)">
+                <span>📋</span> Salin
+              </button>
+            </div>
+            <pre><code>git clone &lt;url-repo&gt;
+cd grade-coffee</code></pre>
+          </div>
+          <p>Atau ekstrak ZIP ke folder pilihan, lalu buka terminal di dalam folder tersebut.</p>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Buat File <code style="font-size:13px;color:var(--accent)">.env</code></h3>
+          <p>Buat file bernama <strong>.env</strong> di folder root proyek (sejajar dengan <code>docker-compose.yml</code>), isi dengan:</p>
+          <div class="code-wrap">
+            <div class="code-header">
+              <span>.env</span>
+              <button class="copy-btn" onclick="copyCode(this)">
+                <span>📋</span> Salin
+              </button>
+            </div>
+            <pre><code><span class="key">APP_ENV</span>=<span class="val">development</span>
+
+<span class="key">DB_NAME</span>=<span class="val">green_bean_grading</span>
+<span class="key">DB_USER</span>=<span class="val">root</span>
+<span class="key">DB_PASSWORD</span>=<span class="val"></span>
+
+<span class="key">CORS_ORIGINS</span>=<span class="val">http://localhost:8080</span></code></pre>
+          </div>
+          <div class="callout info">
+            <span class="callout-icon">ℹ️</span>
+            <div>File <code>.env</code> sudah tersedia di repo. Cukup pastikan isinya sesuai dengan di atas.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Pastikan Model Ada</h3>
+          <p>Pastikan file <strong>backend/weights/best.pt</strong> tersedia di dalam folder proyek.</p>
+          <div class="callout warn">
+            <span class="callout-icon">⚠️</span>
+            <div>Jika file <code>best.pt</code> tidak ada, backend tidak bisa melakukan deteksi. Minta file dari tim atau jalankan training terlebih dahulu.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Jalankan Docker</h3>
+          <p>Pastikan <strong>Docker Desktop sudah terbuka</strong>, lalu jalankan perintah berikut di terminal:</p>
+          <div class="code-wrap">
+            <div class="code-header">
+              <span>powershell</span>
+              <button class="copy-btn" onclick="copyCode(this)">
+                <span>📋</span> Salin
+              </button>
+            </div>
+            <pre><code>docker compose up --build</code></pre>
+          </div>
+          <p>Docker akan otomatis:</p>
+          <ul style="color:var(--muted);padding-left:20px;font-size:14px;line-height:2">
+            <li>Mendownload image MySQL, Python, Node.js, Nginx</li>
+            <li>Build image backend dan frontend</li>
+            <li>Menjalankan migrasi database otomatis</li>
+            <li>Menyalakan semua service</li>
+          </ul>
+          <div class="callout info">
+            <span class="callout-icon">⏱️</span>
+            <div>Build <strong>pertama kali</strong> membutuhkan waktu 5–15 menit tergantung kecepatan internet. Build berikutnya jauh lebih cepat karena cache.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3>Buka Aplikasi</h3>
+          <p>Setelah semua service berjalan (tidak ada error merah di terminal), buka browser:</p>
+          <div class="url-cards">
+            <div class="url-card">
+              <div class="label">🌐 Aplikasi Frontend</div>
+              <div class="url-text">localhost:8080</div>
+              <div class="url-desc">Halaman utama aplikasi</div>
+            </div>
+            <div class="url-card">
+              <div class="label">⚡ Backend API</div>
+              <div class="url-text">localhost:8000</div>
+              <div class="url-desc">REST API endpoint</div>
+            </div>
+            <div class="url-card">
+              <div class="label">📖 API Docs (Swagger)</div>
+              <div class="url-text">localhost:8000/docs</div>
+              <div class="url-desc">Dokumentasi & uji coba API</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end .steps -->
+  </section>
+
+  <!-- ═══════════ AKSES ═══════════ -->
+  <section id="akses">
+    <h2>🔧 Perintah Docker Berguna</h2>
+
+    <h3>Menghentikan Aplikasi</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span>powershell</span>
+        <button class="copy-btn" onclick="copyCode(this)"><span>📋</span> Salin</button>
+      </div>
+      <pre><code>docker compose down</code></pre>
+    </div>
+
+    <h3>Reset Total (hapus database)</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span>powershell</span>
+        <button class="copy-btn" onclick="copyCode(this)"><span>📋</span> Salin</button>
+      </div>
+      <pre><code>docker compose down -v</code></pre>
+    </div>
+
+    <h3>Jalankan Ulang (tanpa build ulang)</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span>powershell</span>
+        <button class="copy-btn" onclick="copyCode(this)"><span>📋</span> Salin</button>
+      </div>
+      <pre><code>docker compose up</code></pre>
+    </div>
+
+    <h3>Lihat Log Realtime</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span>powershell</span>
+        <button class="copy-btn" onclick="copyCode(this)"><span>📋</span> Salin</button>
+      </div>
+      <pre><code>docker compose logs -f</code></pre>
+    </div>
+
+    <h3>Perbarui Model (setelah training baru)</h3>
+    <p>Salin <code>best.pt</code> hasil training ke folder <code>backend/weights/</code>, lalu rebuild backend:</p>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span>powershell</span>
+        <button class="copy-btn" onclick="copyCode(this)"><span>📋</span> Salin</button>
+      </div>
+      <pre><code>docker compose up --build backend</code></pre>
+    </div>
+  </section>
+
+  <!-- ═══════════ TRAINING ═══════════ -->
+  <section id="training">
+    <h2>🧠 Training Model YOLOv8 (Opsional)</h2>
+    <p>Lakukan ini hanya jika ingin melatih ulang model dengan dataset baru. <strong>Tidak diperlukan</strong> untuk menjalankan aplikasi — cukup gunakan <code>best.pt</code> yang sudah ada.</p>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div>Training <strong>tidak berjalan di dalam Docker</strong>. Jalankan langsung di Windows dengan Python.</div>
+    </div>
+
+    <h3>1. Install Python & Dependencies</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span>powershell</span>
+        <button class="copy-btn" onclick="copyCode(this)"><span>📋</span> Salin</button>
+      </div>
+      <pre><code>python -m venv venv
+venv\Scripts\activate
+pip install -r training\requirements.txt</code></pre>
+    </div>
+
+    <h3>2. Jalankan Training</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span>powershell</span>
+        <button class="copy-btn" onclick="copyCode(this)"><span>📋</span> Salin</button>
+      </div>
+      <pre><code>python training\train.py <span class="flag">--data</span> training\data.yaml <span class="flag">--epochs</span> 100</code></pre>
+    </div>
+
+    <table>
+      <tr><th>Flag</th><th>Default</th><th>Keterangan</th></tr>
+      <tr><td><code>--epochs</code></td><td>100</td><td>Jumlah epoch training</td></tr>
+      <tr><td><code>--batch</code></td><td>16</td><td>Kurangi ke 8 jika RAM terbatas</td></tr>
+      <tr><td><code>--device</code></td><td>auto</td><td><code>cpu</code> / <code>cuda</code> / <code>0</code></td></tr>
+      <tr><td><code>--model</code></td><td>yolov8n.pt</td><td>Pakai <code>last.pt</code> untuk lanjut training</td></tr>
+    </table>
+
+    <h3>3. Salin Model ke Backend</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span>powershell</span>
+        <button class="copy-btn" onclick="copyCode(this)"><span>📋</span> Salin</button>
+      </div>
+      <pre><code>copy runs\detect\green_bean\weights\best.pt backend\weights\best.pt</code></pre>
+    </div>
+  </section>
+
+  <!-- ═══════════ ALUR ═══════════ -->
+  <section id="alur">
+    <h2>🔁 Alur Sistem</h2>
+    <div class="flow">
+      <div class="flow-item">📤 Upload Gambar Biji Kopi</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item">🤖 Deteksi YOLOv8 (best.pt)</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item">🔢 Hitung Defect per 350g</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item">🏷️ Penentuan Grade (SCA)</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item">💰 Ambil Harga dari Database</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item">💾 Simpan Riwayat</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item">📊 Tampilkan Hasil + Anotasi</div>
+    </div>
+
+    <h3>Kelas Defect yang Dideteksi</h3>
+    <table>
+      <tr><th>#</th><th>Nama Kelas</th><th>#</th><th>Nama Kelas</th></tr>
+      <tr><td>1</td><td>black</td><td>6</td><td>husk</td></tr>
+      <tr><td>2</td><td>broken</td><td>7</td><td>immature</td></tr>
+      <tr><td>3</td><td>foreign</td><td>8</td><td>infested</td></tr>
+      <tr><td>4</td><td>fraghusk</td><td>9</td><td>sour</td></tr>
+      <tr><td>5</td><td>green</td><td></td><td></td></tr>
+    </table>
+  </section>
+
+  <!-- ═══════════ TROUBLESHOOT ═══════════ -->
+  <section id="troubleshoot">
+    <h2>🧪 Troubleshooting</h2>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggleTrouble(this)">
+        Docker Desktop tidak bisa dibuka / WSL error
+        <span class="arrow">▶</span>
+      </div>
+      <div class="trouble-a">
+        Pastikan WSL 2 sudah aktif. Buka PowerShell sebagai Administrator dan jalankan:<br/><br/>
+        <code>wsl --install</code><br/><br/>
+        Lalu restart PC dan buka Docker Desktop kembali.
+      </div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggleTrouble(this)">
+        Error: port is already allocated (8080 atau 8000)
+        <span class="arrow">▶</span>
+      </div>
+      <div class="trouble-a">
+        Port tersebut digunakan aplikasi lain. Cari dan tutup prosesnya lewat Task Manager,
+        atau ubah port di <code>docker-compose.yml</code>:<br/><br/>
+        <code>ports: - "9080:80"</code> → lalu akses di <code>localhost:9080</code>
+      </div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggleTrouble(this)">
+        Backend restart terus-menerus (keeps restarting)
+        <span class="arrow">▶</span>
+      </div>
+      <div class="trouble-a">
+        Cek file <code>.env</code>, pastikan:<br/><br/>
+        <code>APP_ENV=development</code><br/><br/>
+        Jika diisi <code>production</code>, backend akan menolak CORS dengan domain localhost.
+      </div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggleTrouble(this)">
+        Model best.pt tidak ditemukan / detection error
+        <span class="arrow">▶</span>
+      </div>
+      <div class="trouble-a">
+        Pastikan file <code>backend/weights/best.pt</code> ada. File ini tidak dibuat otomatis —
+        harus disalin dari hasil training atau diminta dari tim.
+      </div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggleTrouble(this)">
+        Database error / tabel tidak ditemukan
+        <span class="arrow">▶</span>
+      </div>
+      <div class="trouble-a">
+        Reset total dengan menghapus volume lama:<br/><br/>
+        <code>docker compose down -v</code><br/>
+        <code>docker compose up --build</code>
+      </div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggleTrouble(this)">
+        Build sangat lambat atau stuck
+        <span class="arrow">▶</span>
+      </div>
+      <div class="trouble-a">
+        Wajar saat pertama kali — Docker mendownload banyak image dan menginstall dependencies.
+        Biarkan sampai selesai. Build berikutnya akan jauh lebih cepat karena layer cache.
+      </div>
+    </div>
+
+  </section>
+
+</div><!-- end .container -->
+
+<footer>
+  Green Bean Grading &nbsp;·&nbsp; Riset & Pendidikan &nbsp;·&nbsp;
+  Dataset dari <a href="https://universe.roboflow.com" target="_blank" style="color:var(--accent)">Roboflow Universe</a> (CC BY 4.0)
+</footer>
+
+<script>
+  function copyCode(btn) {
+    const pre = btn.closest('.code-wrap').querySelector('pre');
+    const text = pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.classList.add('copied');
+      btn.innerHTML = '<span>✅</span> Tersalin!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<span>📋</span> Salin';
+      }, 2000);
+    });
+  }
+
+  function toggleTrouble(el) {
+    el.classList.toggle('open');
+    el.nextElementSibling.classList.toggle('visible');
+  }
+</script>
+
+</body>
+</html>
