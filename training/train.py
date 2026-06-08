@@ -260,9 +260,7 @@ Contoh penggunaan:
     parser.add_argument("--data", type=Path, required=True,
                         help="Path ke data.yaml")
     parser.add_argument("--model", type=str, default="yolov8n.pt",
-                        choices=["yolov8n.pt", "yolov8s.pt", "yolov8m.pt",
-                                 "yolov8l.pt", "yolov8x.pt"],
-                        help="Varian YOLOv8 (default: yolov8n.pt — paling ringan)")
+                        help="Varian YOLOv8 atau path ke checkpoint (default: yolov8n.pt)")
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--batch", type=int, default=16,
                         help="Batch size (kurangi jika OOM)")

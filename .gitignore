@@ -45,12 +45,12 @@ training/runs/**
 
 # Model weights - HANYA best.pt yang dikecualikan
 # (file .pt lain juga dikecualikan)
-**/weights/*.pt
-**/weights/best.pt
-**/weights/last.pt
-best.pt
-last.pt
-*.pt
+# **/weights/*.pt
+# **/weights/best.pt
+# **/weights/last.pt
+# best.pt
+# last.pt
+# *.pt
 
 # ============================================
 # Node.js / Frontend
