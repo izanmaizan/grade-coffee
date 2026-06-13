@@ -2,7 +2,7 @@ task: detect
 mode: train
 model: runs/detect/green_bean/weights/last.pt
 data: training/data.yaml
-epochs: 91
+epochs: 85
 time: null
 patience: 30
 batch: 16

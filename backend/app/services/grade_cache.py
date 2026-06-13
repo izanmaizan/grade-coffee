@@ -31,6 +31,8 @@ def _refresh_if_stale(db: Session) -> None:
     global _loaded_at
     if not _is_fresh():
         rows = db.query(GradePrice).all()
+        for g in rows:
+            db.expunge(g)
         _cache.clear()
         _cache.update({g.grade_code: g for g in rows})
         _loaded_at = time.time()
